@@ -1,7 +1,7 @@
 import os
 import requests
 import bottle.ext.memcache
-from bottle import Bottle, response, hook
+from bottle import Bottle, response
 from app.scrapper import Scrapper
 
 
@@ -11,13 +11,9 @@ plugin = bottle.ext.memcache.MemcachePlugin(
 app.install(plugin)
 
 
-@hook('after_request')
-def enable_cors():
-    response.headers['Access-Control-Allow-Origin'] = '*'
-
-
 @app.route('/')
 def home(mc):
+    response.headers['Access-Control-Allow-Origin'] = '*'
     response.content_type = 'application/json'
     banks_cache = mc.get('banks_cache')
 
