@@ -17,8 +17,10 @@ def home(mc):
     banks_cache = mc.get('banks_cache')
 
     if banks_cache is not None:
+        print('cached')
         return banks_cache
     else:
+        print('not cached')
         url = 'http://www.buscabanco.org.br/AgenciasBancos.asp'
         request = requests.post(url, {'Buscar': 'S'})
         scrap = Scrapper(request.text)
