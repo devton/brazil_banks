@@ -1,17 +1,29 @@
+import os
 import requests
+import bottle.ext.memcache
 from bottle import Bottle, response
 from app.scrapper import Scrapper
 
 
 app = Bottle()
+plugin = bottle.ext.memcache.MemcachePlugin(
+    servers=[os.environ.get('MEMCACHEDCLOUD_SERVERS', 'localhost:11211')])
+app.install(plugin)
 
 
 @app.route('/')
-def home():
+def home(mc):
     response.content_type = 'application/json'
+    banks_cache = mc.get('banks_cache')
 
-    url = 'http://www.buscabanco.org.br/AgenciasBancos.asp'
-    request = requests.post(url, {'Buscar': 'S'})
-    scrap = Scrapper(request.text)
+    if banks_cache is not None:
+        return banks_cache
+    else:
+        url = 'http://www.buscabanco.org.br/AgenciasBancos.asp'
+        request = requests.post(url, {'Buscar': 'S'})
+        scrap = Scrapper(request.text)
 
-    return scrap.as_json()
+        json = scrap.as_json()
+        mc.set('banks_cache', json)
+
+        return json
