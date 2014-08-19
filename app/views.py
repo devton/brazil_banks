@@ -14,6 +14,8 @@ app.install(plugin)
 @app.route('/')
 def home(mc):
     response.content_type = 'application/json'
+    response.charset = 'UTF-8'
+
     banks_cache = mc.get('banks_cache')
 
     if banks_cache is not None:
